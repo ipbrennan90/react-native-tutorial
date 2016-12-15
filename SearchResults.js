@@ -1,7 +1,6 @@
 'use strict'
 
 import React, { Component } from 'react'
-
 import {
 	StyleSheet,
 	Image,
@@ -10,6 +9,7 @@ import {
 	ListView,
 	Text
 } from 'react-native'
+import PropertyView from './PropertyView'
 
 export default class SearchResults extends Component {
 	constructor(props) {
@@ -41,7 +41,7 @@ export default class SearchResults extends Component {
 	renderRow(rowData, sectionID, rowID) {
 		const price = rowData.price_formatted.split(' ')[0];
 		return (
-			<TouchableHighlight underlayColor='#dddddd'>
+			<TouchableHighlight underlayColor='#dddddd' onPress={() => this.rowPressed(rowData.lister_url)}>
 				<View>
 					<View style={styles.rowContainer}>
 						<Image style={styles.thumb} source={{uri: rowData.img_url}} />
@@ -54,6 +54,15 @@ export default class SearchResults extends Component {
 				</View>
 			</TouchableHighlight>
 		);
+	}
+
+	rowPressed(listerURL) {
+		const property = this.props.listings.filter(prop => prop.lister_url === listerURL)[0];
+		this.props.navigator.push({
+			title: 'Property',
+			component: PropertyView,
+			passProps: {property: property}
+		});
 	}
 
 	render() {

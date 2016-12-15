@@ -39,14 +39,34 @@ export default class SearchPage extends Component {
 			isLoading: false,
 			message: ''
 		};
+		this.bindContext()
+	}
+
+	bindContext() {
 		this.onSearchTextChanged = this.onSearchTextChanged.bind(this);
 		this.onSearchPressed = this.onSearchPressed.bind(this);
+		this.onLocationPressed = this.onLocationPressed.bind(this)
 	}
 
 	onSearchTextChanged(e) {
 		console.log('onSearchTextChanged');
 		this.setState({searchString: e.nativeEvent.text});
 		console.log(this.state.searchString);
+	}
+
+	onLocationPressed(e) {
+		navigator.geolocation.getCurrentPosition(
+			location => {
+				const search = location.coords.latitude + ',' + location.coords.longitude
+				this.setState({searchString: search});
+				const query = urlForQueryAndPage('centre_point', search, 1);
+				this._executeQuery(query)
+			},
+			error => {
+				this.setState({
+					message: 'There was a problem with obtaining your location: ' + error
+				});
+			});
 	}
 
 	_executeQuery(query) {
@@ -71,7 +91,7 @@ export default class SearchPage extends Component {
 				passProps: {listings: response.listings}
 			})
 		} else {
-			this.setStae({ message: 'Location not recognize; please try again'});
+			this.setState({ message: 'Location not recognized; please try again'});
 		}
 	}
 
@@ -102,7 +122,7 @@ export default class SearchPage extends Component {
 					</TouchableHighlight>
 				</View>
 				<View style={styles.flowRight}>
-					<TouchableHighlight style={styles.button} underlayColor='#99d9f4'>
+					<TouchableHighlight style={styles.button} underlayColor='#99d9f4' onPress={this.onLocationPressed}>
 						<Text style={styles.buttonText}>Location</Text>
 					</TouchableHighlight>
 				</View>
